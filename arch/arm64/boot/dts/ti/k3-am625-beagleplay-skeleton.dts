@@ -1,0 +1,496 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * AM625 beagleplay skeleton: https://beagleplay.org/
+ *
+ * Copyright (C) 2022-2023 Texas Instruments Incorporated - https://www.ti.com/
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/leds/common.h>
+#include <dt-bindings/gpio/gpio.h>
+#include "k3-am625.dtsi"
+
+/ {
+	compatible =  "beagle,am625-beagleplay", "ti,am625";
+	model = "BeagleBoard.org BeaglePlay";
+
+	aliases {
+		serial2 = &main_uart0;
+	};
+
+	chosen {
+		stdout-path = "serial2:115200n8";
+	};
+
+	cpus {
+		/delete-node/ cpu@1;
+		/delete-node/ cpu@2;
+		/delete-node/ cpu@3;
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		/* 2G RAM */
+		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ramoops: ramoops@9ca00000 {
+			compatible = "ramoops";
+			reg = <0x00 0x9c700000 0x00 0x00100000>;
+			record-size = <0x8000>;
+			console-size = <0x8000>;
+			ftrace-size = <0x00>;
+			pmsg-size = <0x8000>;
+		};
+
+		secure_tfa_ddr: tfa@9e780000 {
+			reg = <0x00 0x9e780000 0x00 0x80000>;
+			no-map;
+		};
+
+		secure_ddr: optee@9e800000 {
+			reg = <0x00 0x9e800000 0x00 0x01800000>;
+			no-map;
+		};
+
+		wkup_r5fss0_core0_dma_memory_region: r5f-dma-memory@9db00000 {
+			compatible = "shared-dma-pool";
+			reg = <0x00 0x9db00000 0x00 0xc00000>;
+			no-map;
+		};
+
+	};
+
+        vsys_5v0: regulator-1 {
+                compatible = "regulator-fixed";
+                regulator-name = "vsys_5v0";
+                regulator-min-microvolt = <5000000>;
+                regulator-max-microvolt = <5000000>;
+                regulator-always-on;
+                regulator-boot-on;
+        };
+
+        vdd_3v3: regulator-2 {
+                /* output of TLV62595DMQR-U12 */
+                compatible = "regulator-fixed";
+                regulator-name = "vdd_3v3";
+                regulator-min-microvolt = <3300000>;
+                regulator-max-microvolt = <3300000>;
+                vin-supply = <&vsys_5v0>;
+                regulator-always-on;
+                regulator-boot-on;
+        };
+
+        vdd_3v3_sd: regulator-4 {
+                /* output of TPS22918DBVR-U21 */
+                pinctrl-names = "default";
+                pinctrl-0 = <&vdd_3v3_sd_pins_default>;
+
+                compatible = "regulator-fixed";
+                regulator-name = "vdd_3v3_sd";
+                regulator-min-microvolt = <3300000>;
+                regulator-max-microvolt = <3300000>;
+                enable-active-high;
+                regulator-always-on;
+                vin-supply = <&vdd_3v3>;
+                gpio = <&main_gpio1 19 GPIO_ACTIVE_HIGH>;
+        };
+
+        vdd_sd_dv: regulator-5 {
+                compatible = "regulator-gpio";
+                regulator-name = "sd_hs200_switch";
+                pinctrl-names = "default";
+                pinctrl-0 = <&vdd_sd_dv_pins_default>;
+                regulator-min-microvolt = <1800000>;
+                regulator-max-microvolt = <3300000>;
+                regulator-boot-on;
+                vin-supply = <&ldo1_reg>;
+                gpios = <&main_gpio1 49 GPIO_ACTIVE_HIGH>;
+                states = <1800000 0x0>,
+                         <3300000 0x1>;
+        };
+};
+
+&main_pmx0 {
+        gpio0_pins_default: gpio0-pins-default {
+                pinctrl-single,pins = <
+                        AM62X_IOPAD(0x0004, PIN_INPUT, 7) /* (G25) OSPI0_LBCLKO.GPIO0_1 */
+                        AM62X_IOPAD(0x0008, PIN_INPUT, 7) /* (J24) OSPI0_DQS.GPIO0_2 */
+                        AM62X_IOPAD(0x000c, PIN_INPUT, 7) /* (E25) OSPI0_D0.GPIO0_3 */
+                        AM62X_IOPAD(0x0010, PIN_INPUT, 7) /* (G24) OSPI0_D1.GPIO0_4 */
+                        AM62X_IOPAD(0x0014, PIN_INPUT, 7) /* (F25) OSPI0_D2.GPIO0_5 */
+                        AM62X_IOPAD(0x0018, PIN_INPUT, 7) /* (F24) OSPI0_D3.GPIO0_6 */
+                        AM62X_IOPAD(0x0024, PIN_INPUT, 7) /* (H25) OSPI0_D6.GPIO0_9 */
+                        AM62X_IOPAD(0x0028, PIN_INPUT, 7) /* (J22) OSPI0_D7.GPIO0_10 */
+                        AM62X_IOPAD(0x002c, PIN_INPUT, 7) /* (F23) OSPI0_CSn0.GPIO0_11 */
+                        AM62X_IOPAD(0x0030, PIN_INPUT, 7) /* (G21) OSPI0_CSn1.GPIO0_12 */
+                        AM62X_IOPAD(0x0034, PIN_INPUT, 7) /* (H21) OSPI0_CSn2.GPIO0_13 */
+                        AM62X_IOPAD(0x0038, PIN_INPUT, 7) /* (E24) OSPI0_CSn3.GPIO0_14 */
+                        AM62X_IOPAD(0x00a4, PIN_INPUT, 7) /* (M22) GPMC0_DIR.GPIO0_40 */
+                        AM62X_IOPAD(0x00ac, PIN_INPUT, 7) /* (L21) GPMC0_CSn1.GPIO0_42 */
+                >;
+        };
+
+        vdd_sd_dv_pins_default: vdd-sd-pins-default {
+                pinctrl-single,pins = <
+                        AM62X_IOPAD(0x0244, PIN_OUTPUT, 7) /* (C17) MMC1_SDWP.GPIO1_49 */
+                >;
+        };
+
+        vdd_3v3_sd_pins_default: vdd-3v3-sd-pins-default {
+                pinctrl-single,pins = <
+                        AM62X_IOPAD(0x01c4, PIN_INPUT, 7) /* (B14) SPI0_D1_GPIO1_19 */
+                >;
+        };
+
+        sd_pins_default: sd-pins-default {
+                pinctrl-single,pins = <
+                        AM62X_IOPAD(0x023c, PIN_INPUT, 0) /* (A21) MMC1_CMD */
+                        AM62X_IOPAD(0x0234, PIN_INPUT, 0) /* (B22) MMC1_CLK */
+                        AM62X_IOPAD(0x0230, PIN_INPUT, 0) /* (A22) MMC1_DAT0 */
+                        AM62X_IOPAD(0x022c, PIN_INPUT, 0) /* (B21) MMC1_DAT1 */
+                        AM62X_IOPAD(0x0228, PIN_INPUT, 0) /* (C21) MMC1_DAT2 */
+                        AM62X_IOPAD(0x0224, PIN_INPUT, 0) /* (D22) MMC1_DAT3 */
+                        AM62X_IOPAD(0x0240, PIN_INPUT, 7) /* (D17) MMC1_SDCD.GPIO1_48 */
+                >;
+        };
+
+        local_i2c_pins_default: local-i2c-pins-default {
+                pinctrl-single,pins = <
+                        AM62X_IOPAD(0x01e0, PIN_INPUT_PULLUP, 0) /* (B16) I2C0_SCL */
+                        AM62X_IOPAD(0x01e4, PIN_INPUT_PULLUP, 0) /* (A16) I2C0_SDA */
+                >;
+        };
+
+        console_pins_default: console-pins-default {
+                pinctrl-single,pins = <
+                        AM62X_IOPAD(0x01c8, PIN_INPUT, 0) /* (D14) UART0_RXD */
+                        AM62X_IOPAD(0x01cc, PIN_OUTPUT, 0) /* (E14) UART0_TXD */
+                >;
+        };
+
+        pmic_irq_pins_default: pmic-irq-pins-default {
+                pinctrl-single,pins = <
+                        AM62X_IOPAD(0x01f4, PIN_INPUT_PULLUP, 0) /* (D16) EXTINTn */
+                >;
+        };
+
+};
+
+&a53_opp_table {
+        /* Requires VDD_CORE to be at 0.85V */
+        opp-1400000000 {
+                opp-hz = /bits/ 64 <1400000000>;
+                opp-supported-hw = <0x01 0x0004>;
+        };
+};
+
+/* cbass_main */
+/* cbass_wkup */
+
+&wkup_i2c0 {
+	status = "disabled";
+};
+
+&wkup_uart0 {
+	/* WKUP UART0 is used by DM firmware */
+	status = "reserved";
+};
+
+/* wkup_conf */
+
+&wkup_rtc0 {
+	status = "disabled";
+};
+
+&wkup_rti0 {
+	/* WKUP RTI0 is used by DM firmware */
+	status = "reserved";
+};
+
+&cbass_mcu {
+	status = "disabled";
+};
+
+/* dmss */
+
+&main_pktdma {
+	status = "disabled";
+};
+
+&main_bcdma {
+	status = "disabled";
+};
+
+/* inta_main_dmss */
+/* secure_proxy_main */
+
+&fss {
+	status = "disabled";
+};
+
+&main_mcan0 {
+	status = "disabled";
+};
+
+&crypto {
+	status = "disabled";
+};
+
+&usbss0 {
+	status = "disabled";
+};
+
+&usbss1 {
+	status = "disabled";
+};
+
+&cpsw3g {
+	status = "disabled";
+};
+
+&main_gpio0 {
+	status = "disabled";
+};
+
+&main_gpio1 {
+	status = "disabled";
+};
+
+&main_i2c0 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&local_i2c_pins_default>;
+        clock-frequency = <400000>;
+        status = "okay";
+
+        tps65219: pmic@30 {
+                compatible = "ti,tps65219";
+                reg = <0x30>;
+                buck1-supply = <&vsys_5v0>;
+                buck2-supply = <&vsys_5v0>;
+                buck3-supply = <&vsys_5v0>;
+                ldo1-supply = <&vdd_3v3>;
+                ldo2-supply = <&buck2_reg>;
+                ldo3-supply = <&vdd_3v3>;
+                ldo4-supply = <&vdd_3v3>;
+
+                pinctrl-names = "default";
+                pinctrl-0 = <&pmic_irq_pins_default>;
+                interrupt-parent = <&gic500>;
+                interrupts = <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
+                interrupt-controller;
+                #interrupt-cells = <1>;
+
+                system-power-controller;
+                ti,power-button;
+
+                regulators {
+                        buck1_reg: buck1 {
+                                regulator-name = "VDD_CORE";
+                                regulator-min-microvolt = <850000>;
+                                regulator-max-microvolt = <850000>;
+                                regulator-boot-on;
+                                regulator-always-on;
+                        };
+
+                        buck2_reg: buck2 {
+                                regulator-name = "VDD_1V8";
+                                regulator-min-microvolt = <1800000>;
+                                regulator-max-microvolt = <1800000>;
+                                regulator-boot-on;
+                                regulator-always-on;
+                        };
+
+                        buck3_reg: buck3 {
+                                regulator-name = "VDD_1V2";
+                                regulator-min-microvolt = <1200000>;
+                                regulator-max-microvolt = <1200000>;
+                                regulator-boot-on;
+                                regulator-always-on;
+                        };
+
+                        ldo1_reg: ldo1 {
+                                /*
+                                 * Regulator is left as is unused, vdd_sd
+                                 * is controlled via GPIO with bypass config
+                                 * as per the NVM configuration
+                                 */
+                                regulator-name = "VDD_SD_3V3";
+                                regulator-min-microvolt = <3300000>;
+                                regulator-max-microvolt = <3300000>;
+                                regulator-allow-bypass;
+                                regulator-boot-on;
+                                regulator-always-on;
+                        };
+
+                        ldo2_reg: ldo2 {
+                                regulator-name = "VDDA_0V85";
+                                regulator-min-microvolt = <850000>;
+                                regulator-max-microvolt = <850000>;
+                                regulator-boot-on;
+                                regulator-always-on;
+                        };
+
+                        ldo3_reg: ldo3 {
+                                regulator-name = "VDDA_1V8";
+                                regulator-min-microvolt = <1800000>;
+                                regulator-max-microvolt = <1800000>;
+                                regulator-boot-on;
+                                regulator-always-on;
+                        };
+
+                        ldo4_reg: ldo4 {
+                                regulator-name = "VDD_2V5";
+                                regulator-min-microvolt = <2500000>;
+                                regulator-max-microvolt = <2500000>;
+                                regulator-boot-on;
+                                regulator-always-on;
+                        };
+                };
+        };
+};
+
+&main_i2c1 {
+	status = "disabled";
+};
+
+&main_i2c2 {
+	status = "disabled";
+};
+
+&main_i2c3 {
+	status = "disabled";
+};
+
+/* gic500 */
+/* gic_its */
+/* main_gpio_intr */
+
+&mailbox0_cluster0 {
+	mbox_m4_0: mbox-m4-0 {
+		ti,mbox-rx = <0 0 0>;
+		ti,mbox-tx = <1 0 0>;
+	};
+};
+
+&mcasp0 {
+	status = "disabled";
+};
+
+&mcasp1 {
+	status = "disabled";
+};
+
+&mcasp2 {
+	status = "disabled";
+};
+
+&sdhci1 {
+	status = "disabled";
+};
+
+&sdhci0 {
+	status = "disabled";
+};
+
+&sdhci2 {
+	status = "disabled";
+};
+
+&epwm0 {
+	status = "disabled";
+};
+
+&epwm1 {
+	status = "disabled";
+};
+
+&epwm2 {
+	status = "disabled";
+};
+
+&main_uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&console_pins_default>;
+	status = "okay";
+};
+
+&main_uart1 {
+	/* Main UART1 is used by TIFS firmware */
+	status = "reserved";
+};
+
+&main_uart2 {
+	status = "disabled";
+};
+
+&main_uart3 {
+	status = "disabled";
+};
+
+&main_uart4 {
+	status = "disabled";
+};
+
+&main_uart5 {
+	status = "disabled";
+};
+
+&main_uart6 {
+	status = "disabled";
+};
+
+&main_spi0 {
+	status = "disabled";
+};
+
+&main_spi1 {
+	status = "disabled";
+};
+
+&main_spi2 {
+	status = "disabled";
+};
+
+&main_rti0 {
+	status = "disabled";
+};
+
+&main_rti1 {
+	status = "disabled";
+};
+
+&main_rti2 {
+	status = "disabled";
+};
+
+&main_rti3 {
+	status = "disabled";
+};
+
+&main_rti15 {
+	status = "disabled";
+};
+
+/* hwspinlock */
+/* oc_sram */
+/* main_conf */
+/* epwm_tbclk */
+/* phy_gmii_sel */
+/* dmsc */
+
+&cluster0 {
+	/delete-node/ core1;
+	/delete-node/ core2;
+	/delete-node/ core3;
+};
+
+/* L2_0 */
+/* pmu */
+/* a53_timer0 */
