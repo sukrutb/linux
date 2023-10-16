@@ -121,10 +121,16 @@ static const struct iio_chan_spec adc124s021_channels[] = {
 	ADC128_VOLTAGE_CHANNEL(3),
 };
 
+static const struct iio_chan_spec adc102s051_channels[] = {
+        ADC128_VOLTAGE_CHANNEL(0),
+        ADC128_VOLTAGE_CHANNEL(1),
+};
+
 static const struct adc128_configuration adc128_config[] = {
-	{ adc128s052_channels, ARRAY_SIZE(adc128s052_channels) },
+	{ adc102s051_channels, ARRAY_SIZE(adc102s051_channels) },
 	{ adc122s021_channels, ARRAY_SIZE(adc122s021_channels) },
 	{ adc124s021_channels, ARRAY_SIZE(adc124s021_channels) },
+	{ adc128s052_channels, ARRAY_SIZE(adc128s052_channels) },
 };
 
 static const struct iio_info adc128_info = {
@@ -177,25 +183,27 @@ static int adc128_probe(struct spi_device *spi)
 }
 
 static const struct of_device_id adc128_of_match[] = {
-	{ .compatible = "ti,adc128s052", .data = &adc128_config[0] },
+	{ .compatible = "ti,adc102s051", .data = &adc128_config[0] },
 	{ .compatible = "ti,adc122s021", .data = &adc128_config[1] },
 	{ .compatible = "ti,adc122s051", .data = &adc128_config[1] },
 	{ .compatible = "ti,adc122s101", .data = &adc128_config[1] },
 	{ .compatible = "ti,adc124s021", .data = &adc128_config[2] },
 	{ .compatible = "ti,adc124s051", .data = &adc128_config[2] },
 	{ .compatible = "ti,adc124s101", .data = &adc128_config[2] },
+	{ .compatible = "ti,adc128s052", .data = &adc128_config[3] },
 	{ /* sentinel */ },
 };
 MODULE_DEVICE_TABLE(of, adc128_of_match);
 
 static const struct spi_device_id adc128_id[] = {
-	{ "adc128s052", (kernel_ulong_t)&adc128_config[0] },
+	{ "adc102s051", (kernel_ulong_t)&adc128_config[0] },
 	{ "adc122s021",	(kernel_ulong_t)&adc128_config[1] },
 	{ "adc122s051",	(kernel_ulong_t)&adc128_config[1] },
 	{ "adc122s101",	(kernel_ulong_t)&adc128_config[1] },
 	{ "adc124s021", (kernel_ulong_t)&adc128_config[2] },
 	{ "adc124s051", (kernel_ulong_t)&adc128_config[2] },
 	{ "adc124s101", (kernel_ulong_t)&adc128_config[2] },
+	{ "adc128s052", (kernel_ulong_t)&adc128_config[3] },
 	{ }
 };
 MODULE_DEVICE_TABLE(spi, adc128_id);
