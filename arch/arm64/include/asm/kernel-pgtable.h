@@ -18,7 +18,7 @@
  * use section mapping with 4K (section size = 2M) but not with 16K (section
  * size = 32M) or 64K (section size = 512M).
  */
-#if PMD_SIZE <= MIN_KIMG_ALIGN
+#if defined(PMD_SIZE) && PMD_SIZE <= MIN_KIMG_ALIGN
 #define SWAPPER_BLOCK_SHIFT	PMD_SHIFT
 #define SWAPPER_SKIP_LEVEL	1
 #else
