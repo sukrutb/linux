@@ -232,23 +232,40 @@
 		reg = <0x01e0>, <0x01e4>, <0x01ec>, <0x01e8>;
 	};
 
-	dpll_abe_x2_ck: clock-dpll-abe-x2 {
-		#clock-cells = <0>;
-		compatible = "ti,omap4-dpll-x2-clock";
-		clock-output-names = "dpll_abe_x2_ck";
-		clocks = <&dpll_abe_ck>;
-	};
+	clock@1f0 {
+		compatible = "ti,clksel";
+		reg = <0x1f0>;
+		#clock-cells = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
 
-	dpll_abe_m2x2_ck: clock-dpll-abe-m2x2-8@1f0 {
-		#clock-cells = <0>;
-		compatible = "ti,divider-clock";
-		clock-output-names = "dpll_abe_m2x2_ck";
-		clocks = <&dpll_abe_x2_ck>;
-		ti,max-div = <31>;
-		ti,autoidle-shift = <8>;
-		reg = <0x01f0>;
-		ti,index-starts-at-one;
-		ti,invert-autoidle-bit;
+		dpll_abe_m2x2_ck: clock@0 {
+			reg = <0>;
+			#clock-cells = <0>;
+			compatible = "ti,divider-clock";
+			clock-output-names = "dpll_abe_m2x2_ck";
+			clocks = <&dpll_abe_x2_ck>;
+			ti,max-div = <31>;
+			ti,index-starts-at-one;
+		};
+
+		dpll_abe_m2_ck: clock@8 {
+			compatible = "fixed-factor-clock";
+			reg = <8>;
+			#clock-cells = <0>;
+			clock-output-names = "dpll_abe_m2_ck";
+			clocks = <&dpll_abe_ck>;
+			clock-mult = <1>;
+			clock-div = <2>;
+		};
+
+		dpll_abe_x2_ck: clock@10 {
+			reg = <10>;
+			#clock-cells = <0>;
+			compatible = "ti,omap4-dpll-x2-clock";
+			clock-output-names = "dpll_abe_x2_ck";
+			clocks = <&dpll_abe_ck>;
+		};
 	};
 
 	abe_clk: clock-abe@108 {
@@ -261,17 +278,6 @@
 		ti,index-power-of-two;
 	};
 
-	dpll_abe_m2_ck: clock-dpll-abe-m2-8@1f0 {
-		#clock-cells = <0>;
-		compatible = "ti,divider-clock";
-		clock-output-names = "dpll_abe_m2_ck";
-		clocks = <&dpll_abe_ck>;
-		ti,max-div = <31>;
-		ti,autoidle-shift = <8>;
-		reg = <0x01f0>;
-		ti,index-starts-at-one;
-		ti,invert-autoidle-bit;
-	};
 
 	dpll_abe_m3x2_ck: clock-dpll-abe-m3x2-8@1f4 {
 		#clock-cells = <0>;
@@ -1433,16 +1439,42 @@
 		reg = <0x0140>, <0x0144>, <0x014c>, <0x0148>;
 	};
 
-	dpll_per_m2_ck: clock-dpll-per-m2-8@150 {
-		#clock-cells = <0>;
-		compatible = "ti,divider-clock";
-		clock-output-names = "dpll_per_m2_ck";
-		clocks = <&dpll_per_ck>;
-		ti,max-div = <31>;
-		ti,autoidle-shift = <8>;
-		reg = <0x0150>;
-		ti,index-starts-at-one;
-		ti,invert-autoidle-bit;
+        clock@150 {
+                compatible = "ti,clksel";
+                reg = <0x150>;
+                #clock-cells = <2>;
+                #address-cells = <1>;
+                #size-cells = <0>;
+
+                dpll_per_m2x2_ck: clock@0 {
+                        reg = <0>;
+                        #clock-cells = <0>;
+                        compatible = "ti,divider-clock";
+                        clock-output-names = "dpll_per_m2x2_ck";
+                        clocks = <&dpll_per_x2_ck>;
+                        ti,max-div = <31>;
+                        ti,autoidle-shift = <8>;
+                        ti,index-starts-at-one;
+                        ti,invert-autoidle-bit;
+                };
+
+                dpll_per_m2_ck: clock@8 {
+                        compatible = "fixed-factor-clock";
+                        reg = <8>;
+                        #clock-cells = <0>;
+                        clocks = <&dpll_per_m2x2_ck>;
+                        clock-mult = <1>;
+                        clock-div = <2>;
+                        clock-output-names = "dpll_per_m2_ck";
+                };
+
+                dpll_per_x2_ck: clock@10 {
+                        reg = <10>;
+                        compatible = "ti,omap4-dpll-x2-clock";
+                        #clock-cells = <0>;
+                        clock-output-names = "dpll_per_x2_ck";
+                        clocks = <&dpll_per_ck>;
+                };
 	};
 
 	func_96m_aon_dclk_div: clock-func-96m-aon-dclk-div {
@@ -1503,13 +1535,6 @@
 		ti,invert-autoidle-bit;
 	};
 
-	dpll_per_x2_ck: clock-dpll-per-x2 {
-		#clock-cells = <0>;
-		compatible = "ti,omap4-dpll-x2-clock";
-		clock-output-names = "dpll_per_x2_ck";
-		clocks = <&dpll_per_ck>;
-	};
-
 	dpll_per_h11x2_ck: clock-dpll-per-h11x2-8@158 {
 		#clock-cells = <0>;
 		compatible = "ti,divider-clock";
@@ -1554,18 +1579,6 @@
 		ti,max-div = <63>;
 		ti,autoidle-shift = <8>;
 		reg = <0x0164>;
-		ti,index-starts-at-one;
-		ti,invert-autoidle-bit;
-	};
-
-	dpll_per_m2x2_ck: clock-dpll-per-m2x2-8@150 {
-		#clock-cells = <0>;
-		compatible = "ti,divider-clock";
-		clock-output-names = "dpll_per_m2x2_ck";
-		clocks = <&dpll_per_x2_ck>;
-		ti,max-div = <31>;
-		ti,autoidle-shift = <8>;
-		reg = <0x0150>;
 		ti,index-starts-at-one;
 		ti,invert-autoidle-bit;
 	};
