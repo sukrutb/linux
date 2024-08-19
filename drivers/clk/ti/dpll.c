@@ -243,16 +243,21 @@ static void _register_dpll_x2(struct device_node *node,
 #if defined(CONFIG_ARCH_OMAP4) || defined(CONFIG_SOC_OMAP5) || \
 	defined(CONFIG_SOC_DRA7XX)
 	if (hw_ops == &clkhwops_omap4_dpllmx) {
-		int ret;
 
+		#if defined (CONFIG_SOC_OMAP5) || defined(CONFIG_SOC_DRA7XX)
+		/* Drop hw-ops for OMAP5 and DRA7xx platform */	
+		clk_hw->ops = NULL;
+		#else
+		int ret;
 		/* Check if register defined, if not, drop hw-ops */
 		ret = of_property_count_elems_of_size(node, "reg", 1);
-		if (ret <= 0) {
-			clk_hw->ops = NULL;
-		} else if (ti_clk_get_reg_addr(node, 0, &clk_hw->clksel_reg)) {
-			kfree(clk_hw);
-			return;
-		}
+			if (ret <= 0) {
+				clk_hw->ops = NULL;
+			} else if (ti_clk_get_reg_addr(node, 0, &clk_hw->clksel_reg)) {
+				kfree(clk_hw);
+				return;
+			}
+		#endif
 	}
 #endif
 
