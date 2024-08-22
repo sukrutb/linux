@@ -1439,16 +1439,41 @@
 		reg = <0x0140>, <0x0144>, <0x014c>, <0x0148>;
 	};
 
-	dpll_per_m2_ck: clock-dpll-per-m2-8@150 {
-		#clock-cells = <0>;
-		compatible = "ti,divider-clock";
-		clock-output-names = "dpll_per_m2_ck";
-		clocks = <&dpll_per_ck>;
-		ti,max-div = <31>;
-		ti,autoidle-shift = <8>;
-		reg = <0x0150>;
-		ti,index-starts-at-one;
-		ti,invert-autoidle-bit;
+	/* CM_DIV_M2_DPLL_PER */
+	clock@150 {
+		compatible = "ti,clksel";
+		reg = <0x150>;
+		#clock-cells = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		dpll_per_m2x2_ck: clock@0 {
+			compatible = "ti,divider-clock";
+			reg = <0>;
+			#clock-cells = <0>;
+			clock-output-names = "dpll_per_m2x2_ck";
+			clocks = <&dpll_per_x2_ck>;
+			ti,max-div = <31>;
+			ti,index-starts-at-one;
+		};
+
+		dpll_per_m2_ck: clock@8 {
+			compatible = "fixed-factor-clock";
+			reg = <8>;
+			#clock-cells = <0>;
+			clock-output-names = "dpll_per_m2_ck";
+			clocks = <&dpll_per_m2x2_ck>;
+			clock-mult = <1>;
+			clock-div = <2>;
+		};
+
+		dpll_per_x2_ck: clock@10 {
+			compatible = "ti,omap4-dpll-x2-clock";
+			reg = <10>;
+			#clock-cells = <0>;
+			clock-output-names = "dpll_per_x2_ck";
+			clocks = <&dpll_per_ck>;
+		};
 	};
 
 	func_96m_aon_dclk_div: clock-func-96m-aon-dclk-div {
@@ -1509,13 +1534,6 @@
 		ti,invert-autoidle-bit;
 	};
 
-	dpll_per_x2_ck: clock-dpll-per-x2 {
-		#clock-cells = <0>;
-		compatible = "ti,omap4-dpll-x2-clock";
-		clock-output-names = "dpll_per_x2_ck";
-		clocks = <&dpll_per_ck>;
-	};
-
 	dpll_per_h11x2_ck: clock-dpll-per-h11x2-8@158 {
 		#clock-cells = <0>;
 		compatible = "ti,divider-clock";
@@ -1560,18 +1578,6 @@
 		ti,max-div = <63>;
 		ti,autoidle-shift = <8>;
 		reg = <0x0164>;
-		ti,index-starts-at-one;
-		ti,invert-autoidle-bit;
-	};
-
-	dpll_per_m2x2_ck: clock-dpll-per-m2x2-8@150 {
-		#clock-cells = <0>;
-		compatible = "ti,divider-clock";
-		clock-output-names = "dpll_per_m2x2_ck";
-		clocks = <&dpll_per_x2_ck>;
-		ti,max-div = <31>;
-		ti,autoidle-shift = <8>;
-		reg = <0x0150>;
 		ti,index-starts-at-one;
 		ti,invert-autoidle-bit;
 	};
