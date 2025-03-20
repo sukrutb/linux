@@ -15,6 +15,7 @@
 #include <linux/of_address.h>
 #include <linux/clk/ti.h>
 #include "clock.h"
+#include "soc.h"
 
 #undef pr_fmt
 #define pr_fmt(fmt) "%s: " fmt, __func__
@@ -240,8 +241,7 @@ static void _register_dpll_x2(struct device_node *node,
 	init.parent_names = &parent_name;
 	init.num_parents = 1;
 
-#if defined(CONFIG_ARCH_OMAP4) || defined(CONFIG_SOC_OMAP5) || \
-	defined(CONFIG_SOC_DRA7XX)
+#if defined(CONFIG_ARCH_OMAP4) || defined(CONFIG_SOC_OMAP5)
 	if (hw_ops == &clkhwops_omap4_dpllmx) {
 		int ret;
 
@@ -392,7 +392,12 @@ cleanup:
 	defined(CONFIG_SOC_DRA7XX)
 static void __init of_ti_omap4_dpll_x2_setup(struct device_node *node)
 {
-	_register_dpll_x2(node, &dpll_x2_ck_ops, &clkhwops_omap4_dpllmx);
+	if (soc_is_dra7xx()) {
+		/* Drop hw-ops for DRA7xx platform */
+		_register_dpll_x2(node, &dpll_x2_ck_ops, NULL);
+	}
+	else
+		_register_dpll_x2(node, &dpll_x2_ck_ops, &clkhwops_omap4_dpllmx);
 }
 CLK_OF_DECLARE(ti_omap4_dpll_x2_clock, "ti,omap4-dpll-x2-clock",
 	       of_ti_omap4_dpll_x2_setup);

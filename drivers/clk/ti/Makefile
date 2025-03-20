@@ -24,3 +24,4 @@ obj-$(CONFIG_SOC_AM43XX)		+= $(clk-common) dpll3xxx.o clk-43xx.o
 endif	# CONFIG_ARCH_OMAP2PLUS
 
 obj-$(CONFIG_COMMON_CLK_TI_ADPLL)	+= adpll.o
+EXTRA_CFLAGS				+= -I$(srctree)/arch/arm/mach-omap2
